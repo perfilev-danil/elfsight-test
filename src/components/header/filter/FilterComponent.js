@@ -88,7 +88,6 @@ export function FilterComponent() {
     setStatusValue(searchParams.get('status') || '');
     setGenderValue(searchParams.get('gender') || '');
     setSpeciesValue(searchParams.get('species') || '');
-    setToReset((prev) => !prev);
   }, [searchParams]);
 
   return (
@@ -96,21 +95,24 @@ export function FilterComponent() {
       <SelectOption
         options={statuses}
         state={''}
-        initialValue={statusValue || 'Status'}
+        currentValue={statusValue || ''}
+        initialValue={'Status'}
         toReset={toReset}
         onChange={setStatusValue}
       ></SelectOption>
       <SelectOption
         options={genders}
         state={''}
-        initialValue={genderValue || 'Gender'}
+        currentValue={genderValue || ''}
+        initialValue={'Gender'}
         toReset={toReset}
         onChange={setGenderValue}
       ></SelectOption>
       <SelectOption
         options={species}
         state={''}
-        initialValue={speciesValue || 'Species'}
+        currentValue={speciesValue || ''}
+        initialValue={'Species'}
         toReset={toReset}
         onChange={setSpeciesValue}
       ></SelectOption>

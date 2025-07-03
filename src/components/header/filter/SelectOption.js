@@ -2,8 +2,14 @@
 import { useState, useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 
-export function SelectOption({ options, initialValue, toReset, onChange }) {
-  const [currentValue, setCurrentValue] = useState(initialValue || '');
+export function SelectOption({
+  options,
+  initialValue,
+  currentValue,
+  toReset,
+  onChange
+}) {
+  const [selectedValue, setSelectedValue] = useState(currentValue || '');
   const [isOpen, setIsOpen] = useState(false);
 
   const handleButtonClick = useCallback((e) => {
@@ -14,7 +20,7 @@ export function SelectOption({ options, initialValue, toReset, onChange }) {
   const handleOptionSelect = useCallback(
     (option) => {
       return () => {
-        setCurrentValue(option);
+        setSelectedValue(option);
         setIsOpen(false);
         onChange(option);
       };
@@ -23,15 +29,22 @@ export function SelectOption({ options, initialValue, toReset, onChange }) {
   );
 
   useEffect(() => {
-    setCurrentValue(initialValue);
-  }, [toReset, initialValue]);
+    setSelectedValue(currentValue || '');
+  }, [currentValue]);
+
+  useEffect(() => {
+    if (toReset) {
+      setSelectedValue('');
+    }
+  }, [toReset]);
 
   const resetSelect = useCallback(
     (e) => {
       e.stopPropagation();
-      setCurrentValue(initialValue);
+      setSelectedValue('');
+      onChange('');
     },
-    [initialValue]
+    [onChange]
   );
 
   useEffect(() => {
@@ -48,14 +61,13 @@ export function SelectOption({ options, initialValue, toReset, onChange }) {
   return (
     <SelectContainer onClick={handleContainerClick}>
       <SelectButton isOpen={isOpen} onClick={handleButtonClick}>
-        {currentValue}
-        <ArrowIcon isOpen={isOpen}>
-          {currentValue && !isOpen ? (
-            <Cross onClick={resetSelect} />
-          ) : (
-            <Caret />
-          )}
-        </ArrowIcon>
+        {selectedValue || initialValue}
+
+        {!isOpen && selectedValue !== initialValue ? (
+          <Cross onClick={resetSelect} />
+        ) : (
+          <Caret isOpen={isOpen} />
+        )}
       </SelectButton>
 
       {isOpen && (
@@ -64,7 +76,7 @@ export function SelectOption({ options, initialValue, toReset, onChange }) {
             <OptionItem
               key={option}
               onClick={handleOptionSelect(option)}
-              selected={option === currentValue}
+              selected={option === selectedValue}
             >
               {option}
             </OptionItem>
@@ -103,11 +115,6 @@ const SelectButton = styled.div`
   &:hover {
     background-color: #334466;
   }
-`;
-
-const ArrowIcon = styled.span`
-  transform: ${({ isOpen }) => (isOpen ? 'rotate(180deg)' : 'rotate(0)')};
-  transition: transform 0.3s;
 `;
 
 const OptionsList = styled.div`
@@ -154,6 +161,9 @@ const Caret = styled.div`
   &:hover {
     border-top-color: #83bf46;
   }
+
+  transform: ${({ isOpen }) => (isOpen ? 'rotate(180deg)' : 'rotate(0)')};
+  transition: transform 0.3s;
 `;
 
 const Cross = styled.div`
